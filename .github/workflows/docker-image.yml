@@ -1,19 +1,25 @@
-name: Docker Image CI
+name: Deploy to DigitalOcean Droplet
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main  # Change to your desired branch
 
 jobs:
-
-  build:
-
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag sgmm-api:latest
+      - name: Checkout Repo
+        uses: actions/checkout@v4
 
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: Connect to Droplet & Deploy
+        run: |
+          sshpass -p "${{ secrets.DO_DROPLET_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.DO_DROPLET_USER }}@${{ secrets.DO_DROPLET_IP }} << 'EOF'
+            cd /path/to/your/repo
+            git pull origin main
+            docker-compose up -d --build
+          EOF
