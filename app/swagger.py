@@ -9,7 +9,7 @@ def get_swagger_spec():
             "description": "API for querying and exploring the St. Gallen Management Model with context-aware knowledge graphs",
             "version": "1.0.0"
         },
-        "basePath": "/api/",
+        "basePath": "/api",
         "schemes": ["http"],
         "consumes": ["application/json", "multipart/form-data"],
         "produces": ["application/json"],
