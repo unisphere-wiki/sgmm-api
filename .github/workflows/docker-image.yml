@@ -26,11 +26,11 @@ jobs:
             echo "MISTRAL_API_KEY=${{ secrets.MISTRAL_API_KEY }}" >> .env
 
             # Export env variables globally (optional)
-            export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-            export MISTRAL_API_KEY=${{ secrets.MISTRAL_API_KEY }}
+            OPENAI_API_KEY=${{ vars.OPENAI_API_KEY }}
+            MISTRAL_API_KEY=${{ vars.MISTRAL_API_KEY }}
 
             docker-compose down
-            
+
             git pull origin main
 
             # Rebuild and recreate containers
