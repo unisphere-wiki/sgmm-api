@@ -10,8 +10,8 @@ def get_swagger_spec():
             "version": "1.0.0"
         },
         "basePath": "/api",
-        "schemes": ["http", "https"],
-        "consumes": ["application/json"],
+        "schemes": ["http"],
+        "consumes": ["application/json", "multipart/form-data"],
         "produces": ["application/json"],
         "paths": {
             "/query": {
@@ -384,9 +384,8 @@ def get_swagger_spec():
             },
             "/node-chat": {
                 "post": {
-                    "tags": ["Node Interaction"],
                     "summary": "Chat with a specific node",
-                    "description": "Enables contextual conversations about specific nodes in the knowledge graph",
+                    "description": "Generate a response to a question about a specific node in the graph",
                     "parameters": [
                         {
                             "name": "body",
@@ -412,6 +411,54 @@ def get_swagger_spec():
                         },
                         "500": {
                             "description": "Server error"
+                        }
+                    }
+                }
+            },
+            "/api/node-quiz": {
+                "post": {
+                    "summary": "Generate a quiz for a specific node",
+                    "description": "Generate a set of multiple-choice questions to test understanding of a specific node",
+                    "requestBody": {
+                        "required": True,
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NodeQuizRequest"
+                                }
+                            }
+                        }
+                    },
+                    "responses": {
+                        "200": {
+                            "description": "Quiz generated successfully",
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "$ref": "#/components/schemas/NodeQuizResponse"
+                                    }
+                                }
+                            }
+                        },
+                        "400": {
+                            "description": "Missing required fields or invalid request",
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "$ref": "#/components/schemas/Error"
+                                    }
+                                }
+                            }
+                        },
+                        "500": {
+                            "description": "Error generating quiz",
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "$ref": "#/components/schemas/Error"
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -790,23 +837,23 @@ def get_swagger_spec():
                 "properties": {
                     "node_id": {
                         "type": "string",
-                        "description": "ID of the node to chat about",
-                        "example": "node_12"
+                        "description": "ID of the node to chat about"
                     },
                     "graph_id": {
                         "type": "string",
-                        "description": "ID of the graph containing the node",
-                        "example": "67dbbafc3b11728551f5ce4c"
+                        "description": "ID of the graph containing the node"
                     },
                     "query": {
                         "type": "string",
-                        "description": "User's question about the node",
-                        "example": "How does this concept apply to healthcare organizations?"
+                        "description": "User's question about the node"
                     },
                     "document_id": {
                         "type": "string",
-                        "description": "ID of the document to use for context",
-                        "example": "67dbac15ea53f25878bfa9fd"
+                        "description": "Document ID to use for context"
+                    },
+                    "query_id": {
+                        "type": "string",
+                        "description": "ID of the original query that created the graph (optional)"
                     },
                     "chat_history": {
                         "type": "array",
@@ -906,6 +953,81 @@ def get_swagger_spec():
                         "format": "float",
                         "description": "Relevance score (0-1)",
                         "example": 0.87
+                    }
+                }
+            },
+            "NodeQuizRequest": {
+                "type": "object",
+                "required": ["node_id", "graph_id", "document_id"],
+                "properties": {
+                    "node_id": {
+                        "type": "string",
+                        "description": "ID of the node to quiz about"
+                    },
+                    "graph_id": {
+                        "type": "string",
+                        "description": "ID of the graph containing the node"
+                    },
+                    "document_id": {
+                        "type": "string",
+                        "description": "ID of the source document"
+                    },
+                    "query_id": {
+                        "type": "string",
+                        "description": "Optional ID of the original query that created the graph"
+                    },
+                    "num_questions": {
+                        "type": "integer",
+                        "description": "Number of questions to generate (default: 5, max: 10)",
+                        "default": 5,
+                        "minimum": 1,
+                        "maximum": 10
+                    }
+                }
+            },
+            "NodeQuizResponse": {
+                "type": "object",
+                "properties": {
+                    "questions": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "question": {
+                                    "type": "string",
+                                    "description": "The quiz question"
+                                },
+                                "options": {
+                                    "type": "object",
+                                    "properties": {
+                                        "A": {
+                                            "type": "string",
+                                            "description": "Option A"
+                                        },
+                                        "B": {
+                                            "type": "string",
+                                            "description": "Option B"
+                                        },
+                                        "C": {
+                                            "type": "string",
+                                            "description": "Option C"
+                                        },
+                                        "D": {
+                                            "type": "string",
+                                            "description": "Option D"
+                                        }
+                                    }
+                                },
+                                "correct_answer": {
+                                    "type": "string",
+                                    "description": "The letter of the correct answer (A, B, C, or D)"
+                                },
+                                "explanation": {
+                                    "type": "string",
+                                    "description": "Explanation of why the answer is correct"
+                                }
+                            }
+                        }
                     }
                 }
             }

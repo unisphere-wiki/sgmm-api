@@ -300,6 +300,7 @@ Enables interactive conversations about specific nodes in the knowledge graph.
   "graph_id": "67dbbafc3b11728551f5ce4c",
   "query": "How does this concept apply to healthcare organizations?",
   "document_id": "67dbac15ea53f25878bfa9fd",
+  "query_id": "67dbb7e4e16c33a1dc67a8ae",
   "chat_history": [
     {
       "role": "user",
@@ -321,6 +322,7 @@ Enables interactive conversations about specific nodes in the knowledge graph.
 
 **Optional Parameters:**
 - `chat_history`: Previous messages in the conversation
+- `query_id`: ID of the original query that created the graph
 
 - **Response**: `200 OK`
 
@@ -391,6 +393,50 @@ print("\nSuggested questions:")
 for question in data['suggested_questions']:
     print(f"- {question}")
 ```
+
+### Node Quiz
+
+Generate quiz questions about a specific node in the graph.
+
+**Endpoint:** `POST /api/node-quiz`
+
+**Request Body:**
+```json
+{
+  "node_id": "node_1",              // Required: ID of the node to quiz about
+  "graph_id": "67dbbafc3b11728551f5ce4c",  // Required: ID of the graph
+  "document_id": "67dbac15ea53f25878bfa9fd",  // Required: ID of the source document
+  "query_id": "67dbabf2ea53f25878bfa9fc",  // Optional: ID of the original query that created the graph
+  "num_questions": 5                // Optional: Number of questions to generate (default: 5, max: 10)
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "questions": [
+    {
+      "question": "Which of the following best describes the concept of 'Environment' in the St. Gallen Management Model?",
+      "options": {
+        "A": "The physical workspace where management activities occur",
+        "B": "The internal processes and functions of an organization",
+        "C": "The external factors and conditions that influence an organization",
+        "D": "The personal relationships among management team members"
+      },
+      "correct_answer": "C",
+      "explanation": "In the St. Gallen Management Model, 'Environment' refers to the external context in which an organization operates, including social, technological, economic, environmental, and political factors that influence the organization's strategy and operations."
+    },
+    // Additional questions...
+  ]
+}
+```
+
+**Error Responses:**
+- `400 Bad Request`: Missing required fields or invalid request
+- `404 Not Found`: Node, graph, or document not found
+- `500 Internal Server Error`: Error generating quiz
+
+This endpoint generates a set of multiple-choice questions (A, B, C, D) to test understanding of a specific node's concept, including correct answers and explanations. You can optionally specify the number of questions (between 1 and 10) and provide the query_id for additional context.
 
 ## Context Parameter Reference
 

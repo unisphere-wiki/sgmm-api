@@ -365,6 +365,7 @@ def node_chat():
         "graph_id": "67dbbafc3b11728551f5ce4c",
         "query": "How does this concept apply to healthcare organizations?",
         "document_id": "67dbac15ea53f25878bfa9fd",
+        "query_id": "67dbb7e4e16c33a1dc67a8ae",
         "chat_history": [
             {"role": "user", "content": "Can you explain this concept in simpler terms?"},
             {"role": "assistant", "content": "This concept refers to how organizations structure their decision-making processes..."}
@@ -372,7 +373,7 @@ def node_chat():
     }
     ```
     
-    The chat_history field is optional.
+    The chat_history and query_id fields are optional. The query_id refers to the original query that created the graph.
     """
     try:
         data = request.get_json()
@@ -391,6 +392,7 @@ def node_chat():
         query = data['query']
         document_id = data['document_id']
         chat_history = data.get('chat_history', [])
+        query_id = data.get('query_id')
         
         # Generate response
         result = node_chat_service.generate_chat_response(
@@ -398,7 +400,8 @@ def node_chat():
             node_id, 
             query, 
             document_id, 
-            chat_history
+            chat_history,
+            query_id
         )
         
         # Check if there was an error
@@ -407,5 +410,69 @@ def node_chat():
             
         return jsonify(result), 200
         
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@api.route('/node-quiz', methods=['POST'])
+def node_quiz():
+    """
+    Generate a quiz about a specific node in the graph.
+    
+    Request payload:
+    {
+        "node_id": "node_1",              # Required: ID of the node to quiz about
+        "graph_id": "6405f...",           # Required: ID of the graph
+        "document_id": "6405f...",        # Required: ID of the source document
+        "query_id": "6405f..."            # Optional: ID of the original query that created the graph
+        "num_questions": 5                # Optional: Number of questions to generate (default: 5)
+    }
+    
+    Returns:
+        200 OK: Quiz generated successfully
+        400 Bad Request: Missing required fields or invalid request
+        404 Not Found: Node, graph, or document not found
+        500 Internal Server Error: Error generating quiz
+    """
+    try:
+        from app.services.node_quiz_service import NodeQuizService
+        
+        data = request.json
+        
+        # Check required fields
+        required_fields = ["node_id", "graph_id", "document_id"]
+        for field in required_fields:
+            if field not in data:
+                return jsonify({"error": f"Missing required field: {field}"}), 400
+        
+        node_id = data["node_id"]
+        graph_id = data["graph_id"]
+        document_id = data["document_id"]
+        
+        # Optional fields
+        query_id = data.get("query_id")
+        num_questions = int(data.get("num_questions", 5))
+        
+        # Validate num_questions
+        if num_questions < 1:
+            num_questions = 1
+        elif num_questions > 10:
+            num_questions = 10
+        
+        # Generate quiz
+        node_quiz_service = NodeQuizService()
+        quiz_response = node_quiz_service.generate_quiz(
+            graph_id=graph_id,
+            node_id=node_id,
+            document_id=document_id,
+            query_id=query_id,
+            num_questions=num_questions
+        )
+        
+        # Check for errors
+        if "error" in quiz_response:
+            # If the service returned a specific error message
+            return jsonify({"error": quiz_response["error"]}), 500
+        
+        return jsonify(quiz_response), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500 
