@@ -4,7 +4,7 @@ from openai import OpenAI
 from app.config import OPENAI_API_KEY, LLM_MODEL
 from app.services.graph_service import GraphService
 from app.services.embeddings_service import EmbeddingsService
-from app.models.db_models import Document
+from app.models.db_models import Document, Query
 
 class NodeChatService:
     """Service to handle node-specific chat functionality"""
@@ -15,7 +15,7 @@ class NodeChatService:
         self.embeddings_service = EmbeddingsService()
         self.llm_model = LLM_MODEL
     
-    def generate_chat_response(self, graph_id, node_id, query, document_id, chat_history=None):
+    def generate_chat_response(self, graph_id, node_id, query, document_id, chat_history=None, query_id=None):
         """
         Generate a chat response for a specific node
         
@@ -25,6 +25,7 @@ class NodeChatService:
             query (str): User query about the node
             document_id (str): ID of the document to use for context
             chat_history (list, optional): Previous chat messages
+            query_id (str, optional): ID of the original query that created the graph
             
         Returns:
             dict: Response with text, examples, related nodes, and suggested questions
@@ -46,12 +47,20 @@ class NodeChatService:
             node_layer = node["layer"]
             node_relevance = node["relevance"]
             
+            # Get original query context if query_id is provided
+            original_query_context = ""
+            if query_id:
+                original_query = Query.get_by_id(query_id)
+                if original_query:
+                    original_query_context = f"\nOriginal Query: {original_query.get('query_text', '')}\n"
+            
             # Get node connections for additional context
             connections = self.graph_service.get_node_connections(graph_id, node_id)
             
             # Build node context string
             node_context = f"Node Title: {node_title}\nNode Description: {node_description}\n"
             node_context += f"Layer: {node_layer}\nRelevance: {node_relevance}/10\n"
+            node_context += original_query_context
             
             # Add path information if available
             if "path" in node_details:

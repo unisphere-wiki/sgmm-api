@@ -32,6 +32,7 @@ services:
       - LLM_MODEL=${LLM_MODEL:-gpt-4o}
       - CHUNK_SIZE=${CHUNK_SIZE:-1000}
       - CHUNK_OVERLAP=${CHUNK_OVERLAP:-200}
+    command: gunicorn --bind 0.0.0.0:5000 --timeout 300 --workers 2 --worker-class sync run:app
     volumes:
       - ./app:/app/app
       - ./uploads:/app/uploads

@@ -33,6 +33,9 @@ env/
 
 # Docker
 .dockerignore
+docker-compose.override.yml
+docker-compose.local.yml
+docker.env
 
 # Environment variables
 .env
@@ -58,6 +61,12 @@ local_storage/
 # Logs
 *.log
 logs/
+nginx/logs/
+
+# Backups
+backups/
+*.tar.gz
+*.backup
 
 # OS-specific
 .DS_Store
@@ -73,4 +82,5 @@ instance/
 .webassets-cache
 
 # Application specific
-*.log 
+*.log
+nginx/ssl/ 

@@ -56,10 +56,22 @@ sgmm_app/
 │   └── utils/               # Utility functions
 │       └── init_db.py       # Database initialization
 ├── .env.example             # Environment variables template
+├── docker-compose.yml       # Default Docker Compose configuration 
+├── docker-compose.local.yml # Docker Compose for local development
 ├── README.md                # Documentation
 ├── requirements.txt         # Python dependencies
 └── run.py                   # Application entry point
 ```
+
+## Docker Configuration
+
+The application includes two Docker Compose configurations:
+
+1. **Default** (`docker-compose.yml`): Standard configuration for the application.
+
+2. **Local Development** (`docker-compose.local.yml`): Configured specifically for local development purposes. This file is identical to the default configuration but kept separately for local development workflows.
+
+For deployment to production environments, your DevOps team can modify the default configuration as needed.
 
 ## Documentation
 
@@ -74,7 +86,10 @@ Detailed documentation for the application is available in the `docs` folder:
 
 ### Option 1: Docker Setup (Recommended)
 
-The easiest way to run the application is using Docker and Docker Compose, which will set up all necessary services automatically.
+The easiest way to run the application is using Docker and Docker Compose, which will set up all necessary services automatically. The project includes two Docker Compose configurations for different environments:
+
+- `docker-compose.local.yml` - For local development with debug settings
+- `docker-compose.prod.yml` - For production deployment with security features
 
 #### Prerequisites
 
@@ -82,7 +97,7 @@ The easiest way to run the application is using Docker and Docker Compose, which
 - OpenAI API key
 - Mistral AI API key
 
-#### Steps
+#### Steps for Local Development
 
 1. Clone the repository:
    ```
@@ -103,20 +118,42 @@ The easiest way to run the application is using Docker and Docker Compose, which
 
 4. Start the application stack:
    ```
+   # Using default configuration
    docker-compose up -d
+   
+   # OR using the local development configuration
+   docker-compose -f docker-compose.local.yml up -d
    ```
 
 The application will be available at http://localhost:5001 once all services are up. The database will be automatically initialized with sample data.
 
 To stop the application:
 ```
+# If using default configuration
 docker-compose down
+
+# OR if using local development configuration
+docker-compose -f docker-compose.local.yml down
 ```
 
 To view logs:
 ```
+# If using default configuration
 docker-compose logs -f
+
+# OR if using local development configuration
+docker-compose -f docker-compose.local.yml logs -f
 ```
+
+#### Production Deployment
+
+For production deployment, please follow the instructions in [Docker Setup Documentation](DOCKER_README.md), which includes:
+
+- Setting up secure environment variables
+- Configuring MongoDB authentication
+- Enabling Weaviate API key protection
+- Setting up Nginx as a reverse proxy
+- Volume management and backups
 
 ### Option 2: Manual Setup
 
@@ -191,6 +228,11 @@ The API will be available at `http://localhost:5001`.
 - `GET /api/connections/{graph_id}`: Get all connections for a graph
 - `GET /api/connections/{graph_id}/{node_id}`: Get connections for a specific node
 
+### Interactive Learning
+
+- `POST /api/node-chat`: Interactive chat about a specific node in the graph
+- `POST /api/node-quiz`: Generate a quiz to test understanding of a specific node
+
 ### Document Management
 
 - `POST /api/document`: Upload and process a new document
@@ -238,8 +280,11 @@ The system includes a command-line utility for importing PDF books:
 # When running without Docker
 python -m app.utils.import_book path/to/your/textbook.pdf --title "St. Gallen Management Model" --author "Author Name" --year 2023
 
-# When running with Docker
+# When running with Docker (default config)
 docker-compose exec sgmm-app python -m app.utils.import_book /app/books/textbook.pdf --title "St. Gallen Management Model" --author "Author Name" --year 2023
+
+# When running with Docker (local config)
+docker-compose -f docker-compose.local.yml exec sgmm-app python -m app.utils.import_book /app/books/textbook.pdf --title "St. Gallen Management Model" --author "Author Name" --year 2023
 ```
 
 For Docker users, first copy your PDF to the books directory:
