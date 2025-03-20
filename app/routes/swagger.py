@@ -6,7 +6,7 @@ from app.swagger import get_swagger_spec
 swagger_json = Blueprint('swagger_json', __name__)
 
 # Create the SwaggerUI Blueprint
-SWAGGER_URL = '/api/docs'  # URL for accessing the Swagger UI
+SWAGGER_URL = '/api/docs/'  # URL for accessing the Swagger UI
 API_URL = '/api/swagger.json'  # URL for the Swagger JSON
 
 swaggerui_blueprint = get_swaggerui_blueprint(
@@ -20,4 +20,4 @@ swaggerui_blueprint = get_swaggerui_blueprint(
 @swagger_json.route('/swagger.json', methods=['GET'])
 def swagger_spec():
     """Returns the Swagger specification JSON"""
-    return jsonify(get_swagger_spec()) 
+    return jsonify(get_swagger_spec())
