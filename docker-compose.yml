@@ -9,6 +9,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./root-dist:/nginx/dist:ro
     depends_on:
       - sgmm-app
       - mongodb
