@@ -415,49 +415,37 @@ def get_swagger_spec():
                     }
                 }
             },
-            "/api/node-quiz": {
+            "/node-quiz": {
                 "post": {
                     "summary": "Generate a quiz for a specific node",
                     "description": "Generate a set of multiple-choice questions to test understanding of a specific node",
-                    "requestBody": {
-                        "required": True,
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/NodeQuizRequest"
-                                }
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "required": True,
+                            "schema": {
+                                "$ref": "#/definitions/NodeQuizRequest"
                             }
                         }
-                    },
+                    ],
                     "responses": {
                         "200": {
                             "description": "Quiz generated successfully",
-                            "content": {
-                                "application/json": {
-                                    "schema": {
-                                        "$ref": "#/components/schemas/NodeQuizResponse"
-                                    }
-                                }
+                            "schema": {
+                                "$ref": "#/definitions/NodeQuizResponse"
                             }
                         },
                         "400": {
                             "description": "Missing required fields or invalid request",
-                            "content": {
-                                "application/json": {
-                                    "schema": {
-                                        "$ref": "#/components/schemas/Error"
-                                    }
-                                }
+                            "schema": {
+                                "$ref": "#/definitions/Error"
                             }
                         },
                         "500": {
                             "description": "Error generating quiz",
-                            "content": {
-                                "application/json": {
-                                    "schema": {
-                                        "$ref": "#/components/schemas/Error"
-                                    }
-                                }
+                            "schema": {
+                                "$ref": "#/definitions/Error"
                             }
                         }
                     }
@@ -1028,6 +1016,16 @@ def get_swagger_spec():
                                 }
                             }
                         }
+                    }
+                }
+            },
+            "Error": {
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "type": "string",
+                        "description": "Error message",
+                        "example": "Missing required fields or invalid request"
                     }
                 }
             }
