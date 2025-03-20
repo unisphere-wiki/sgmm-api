@@ -19,7 +19,7 @@ jobs:
       - name: Connect to Droplet & Deploy
         run: |
           sshpass -p "${{ secrets.DO_DROPLET_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.DO_DROPLET_USER }}@${{ secrets.DO_DROPLET_IP }} << 'EOF'
-            cd /path/to/your/repo
+            cd /root/sgmm-api
             git pull origin main
             docker-compose up -d --build
           EOF
