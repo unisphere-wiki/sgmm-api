@@ -73,5 +73,4 @@ instance/
 .webassets-cache
 
 # Application specific
-data/
 *.log 

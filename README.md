@@ -106,7 +106,7 @@ The easiest way to run the application is using Docker and Docker Compose, which
    docker-compose up -d
    ```
 
-The application will be available at http://localhost:5000 once all services are up. The database will be automatically initialized with sample data.
+The application will be available at http://localhost:5001 once all services are up. The database will be automatically initialized with sample data.
 
 To stop the application:
 ```
@@ -170,7 +170,7 @@ docker-compose logs -f
    python run.py
    ```
 
-The API will be available at `http://localhost:5000`.
+The API will be available at `http://localhost:5001`.
 
 ## API Endpoints
 
@@ -274,11 +274,28 @@ Once your book is imported, the system will:
 You can verify the import was successful by checking the available documents:
 ```bash
 # API endpoint
-GET http://localhost:5000/api/documents
+GET http://localhost:5001/api/documents
 
 # Command line with Docker
 docker-compose exec sgmm-app python -c "from app.models.db_models import Document; print(Document.get_all())"
 ```
+
+## Book Storage Directories
+
+The application supports two locations for storing books:
+
+1. **`books/` directory (root level)**: This directory is mounted directly to the Docker container at `/app/books/`. Use this directory when running with Docker. This is the recommended location for adding your books for import.
+
+   ```bash
+   # Example when running with Docker
+   mkdir -p books
+   cp path/to/your/sgmm_textbook.pdf books/
+   docker-compose exec sgmm-app python -m app.utils.import_book /app/books/sgmm_textbook.pdf --title "St. Gallen Management Model" --author "Author Name"
+   ```
+
+2. **`app/data/book/` directory**: This directory contains the sample St. Gallen Management Model PDF that is included with the application. It's used internally as a default document that can be accessed when no custom books have been imported. You typically don't need to place files here directly.
+
+When using the import script or API, books will be properly processed and stored in the appropriate locations automatically. But by default the textbook is always going to be there, single its our default reference
 
 ## License
 
