@@ -21,13 +21,8 @@ jobs:
           sshpass -p "${{ secrets.DO_DROPLET_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.DO_DROPLET_USER }}@${{ secrets.DO_DROPLET_IP }} << 'EOF'
             cd /root/sgmm-api
 
-            # Store environment variables in .env file
-            echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" > .env
-            echo "MISTRAL_API_KEY=${{ secrets.MISTRAL_API_KEY }}" >> .env
-
-            # Export env variables globally (optional)
-            OPENAI_API_KEY=${{ vars.OPENAI_API_KEY }}
-            MISTRAL_API_KEY=${{ vars.MISTRAL_API_KEY }}
+            echo "OPENAI_API_KEY=${{ vars.OPENAI_API_KEY }}" > .env
+            echo "MISTRAL_API_KEY=${{ vars.MISTRAL_API_KEY }}" >> .env
 
             docker-compose down
 
