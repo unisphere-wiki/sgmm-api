@@ -9,7 +9,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - ./root-dist:/nginx/dist:ro
+      - ./unisphere:/nginx/unisphere-dist:ro
       - ./bizquery:/nginx/bizquery-dist:ro
     depends_on:
       - sgmm-app
